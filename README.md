@@ -6,7 +6,7 @@ The whole API is four functions. Each transformer takes an arena allocator and r
 
 Write it to any response body with `Content-Type: text/event-stream` and you're done — works with the stdlib HTTP server, [`http.zig`](https://github.com/karlseguin/http.zig), [`dusty`](https://github.com/lalinsky/dusty), `zap`, `jetzig`, `tokamak`, or whatever else.
 
-Passes the official Datastar SDK validation suite (see `tests/validation.zig` — a self-contained harness on top of `std.http.Server` that proves it).
+Passes the official Datastar SDK validation suite (see `tests/validation.zig` — a self-contained harness on top of `std.http.Server`).
 
 ## Zig Version
 
@@ -175,7 +175,9 @@ The harness in `tests/validation.zig` is itself a reference for "how to use the 
 
 ## Looking for a bundled HTTP server too?
 
-This repo is SDK-only. If you want a Datastar-aware HTTP server bundled with the SDK — fast radix-tree router, batched + sync SSE, hot reload, optional pub/sub — see the sibling repo [`datastar.zig`](https://github.com/zigster64/datastar.zig).
+This repo is SDK-only.
+
+If you want a Datastar-aware HTTP server bundled with the SDK — with a router, batched + sync SSE, hot reload, pub/sub message bus for CQRS — see the sibling repo [`datastar.zig`](https://github.com/zigster64/datastar.zig).
 
 ## More on Datastar
 
