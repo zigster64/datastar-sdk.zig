@@ -25,6 +25,21 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_datastar_tests.step);
     check.dependOn(&datastar_tests.step);
 
+    // Datastar SDK validation harness — builds with plain `zig build`.
+    // Listens on :7331 and is exercised by the official Datastar validator:
+    //   go run github.com/starfederation/datastar/sdk/tests/cmd/datastar-sdk-tests@latest
+    const validation_test = b.addExecutable(.{
+        .name = "validation-test",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tests/validation.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    validation_test.root_module.addImport("datastar", datastar_module);
+    b.installArtifact(validation_test);
+    check.dependOn(&validation_test.step);
+
     // Optional example: karlseguin/http.zig port — built only via `zig build http.zig`.
     const httpz = b.dependency("httpz", .{
         .target = target,

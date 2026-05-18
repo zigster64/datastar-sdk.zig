@@ -2,9 +2,11 @@
 
 A small, framework-agnostic Zig 0.16 SDK for [Datastar](https://data-star.dev) — patch DOM elements, patch signals, and execute scripts on the browser from your backend over SSE.
 
-The whole API is four functions. Each transformer takes an arena allocator and returns a ready-to-ship `event: ...\ndata: ...\n\n` SSE block. Write it to any response body with `Content-Type: text/event-stream` and you're done — works with the stdlib HTTP server, [`http.zig`](https://github.com/karlseguin/http.zig), [`dusty`](https://github.com/lalinsky/dusty), `zap`, `jetzig`, `tokamak`, or whatever else.
+The whole API is four functions. Each transformer takes an arena allocator and returns a ready-to-ship `event: ...\ndata: ...\n\n` SSE block.
 
-Passes the official Datastar SDK validation suite.
+Write it to any response body with `Content-Type: text/event-stream` and you're done — works with the stdlib HTTP server, [`http.zig`](https://github.com/karlseguin/http.zig), [`dusty`](https://github.com/lalinsky/dusty), `zap`, `jetzig`, `tokamak`, or whatever else.
+
+Passes the official Datastar SDK validation suite (see `tests/validation.zig` — a self-contained harness on top of `std.http.Server` that proves it).
 
 ## Zig Version
 
@@ -155,10 +157,21 @@ fn readSignalsAnyFramework(
 ## Build, Run, Test
 
 ```bash
-zig build test          # run SDK unit tests
-zig build http.zig      # build the http.zig kitchen-sink demo
-zig build dusty         # build the dusty kitchen-sink demo
+zig build                       # builds zig-out/bin/validation-test
+zig build test                  # run SDK unit tests
+zig build http.zig              # build the http.zig kitchen-sink demo
+zig build dusty                 # build the dusty kitchen-sink demo
+./zig-out/bin/validation-test   # serve the Datastar SDK conformance harness on :7331
 ```
+
+To prove the SDK conforms to the Datastar wire protocol, run the validation harness and point the official validator at it:
+
+```bash
+./zig-out/bin/validation-test &
+go run github.com/starfederation/datastar/sdk/tests/cmd/datastar-sdk-tests@latest
+```
+
+The harness in `tests/validation.zig` is itself a reference for "how to use the SDK with `std.http.Server`" — about 250 lines, no extra dependencies.
 
 ## Looking for a bundled HTTP server too?
 
