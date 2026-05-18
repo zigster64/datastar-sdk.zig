@@ -1,0 +1,25 @@
+.{
+    .name = .datastar_sdk_zig,
+    .version = "0.1.0",
+    .minimum_zig_version = "0.16.0",
+    .fingerprint = 0xa6172b1876441321,
+    .dependencies = .{
+        // These dependencies are NOT NEEDED to use the Datastar SDK
+        // they only exist in here to build the example apps that use a variety of different web servers
+        .httpz = .{
+            .url = "git+https://github.com/karlseguin/http.zig#250e208845249e41d48a996dbfb0ce18d2e82761",
+            .hash = "httpz-0.0.0-PNVzrJwbCACCRQFU-_piWqJ_sXHCwxyp4HkHLAyY4msq",
+        },
+        // These dependencies are NOT NEEDED to use the Datastar SDK
+        // they only exist in here to build the example apps that use a variety of different web servers
+        .dusty = .{
+            .url = "git+https://github.com/lalinsky/dusty#28a97b118bf1893a17a47fb77bf6529dd997ad99",
+            .hash = "dusty-0.1.0-Qdw7RqYcCgBfokVHhdXJhX5a7vuSjNx2Yeg-xgcAWSmc",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
