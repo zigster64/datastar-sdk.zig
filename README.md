@@ -1,4 +1,4 @@
-# Datastar Zig SDK for v0.16
+# Datastar SDK for Zig v0.16
 
 A small, framework-agnostic Zig 0.16 SDK for [Datastar](https://data-star.dev) — patch DOM elements, patch signals, and execute scripts on the browser from your backend over SSE.
 
