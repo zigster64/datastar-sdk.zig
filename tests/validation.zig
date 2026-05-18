@@ -203,11 +203,12 @@ fn runTest(arena: std.mem.Allocator, request: *std.http.Server.Request) !void {
     });
 }
 
-// The validator's `signals-raw` payload is a JSON-escaped multi-line string
-// (e.g. `{\n  "foo": 1\n}`). The Datastar wire format requires every line of
-// the JSON to be prefixed with `data: signals `. The SDK's typed
-// `patchSignals` re-serializes its input via `std.json.fmt` and would collapse
-// the whitespace, so for raw-multiline tests we hand-build the SSE block.
+// The validator's `signals-raw` payload arrives as a multi-line JSON string
+// (e.g. `{\n  "foo": 1\n}` in the JSON, which the parser unescapes into real
+// `\n` bytes). The Datastar wire format needs every line of that JSON to be
+// prefixed with `data: signals `. The SDK's typed `patchSignals` would
+// re-serialize via `std.json.fmt` and collapse the whitespace, so we
+// hand-build the SSE block for the raw-multiline case.
 fn emitPatchSignalsRaw(w: *Io.Writer, raw: []const u8, opts: datastar.PatchSignalsOptions) !void {
     try w.writeAll("event: datastar-patch-signals\n");
     if (opts.event_id) |id| try w.print("id: {s}\n", .{id});
@@ -215,29 +216,14 @@ fn emitPatchSignalsRaw(w: *Io.Writer, raw: []const u8, opts: datastar.PatchSigna
     if (opts.only_if_missing) try w.writeAll("data: onlyIfMissing true\n");
 
     var line_in_progress = false;
-    var escape = false;
     for (raw) |c| {
-        if (escape) {
-            escape = false;
-            switch (c) {
-                'n' => {
-                    if (line_in_progress) {
-                        try w.writeAll("\n");
-                        line_in_progress = false;
-                    } else {
-                        try w.writeAll("data: signals \n");
-                    }
-                },
-                else => {
-                    if (!line_in_progress) {
-                        try w.writeAll("data: signals ");
-                        line_in_progress = true;
-                    }
-                    try w.writeByte(c);
-                },
+        if (c == '\n') {
+            if (line_in_progress) {
+                try w.writeAll("\n");
+                line_in_progress = false;
+            } else {
+                try w.writeAll("data: signals \n");
             }
-        } else if (c == '\\') {
-            escape = true;
         } else {
             if (!line_in_progress) {
                 try w.writeAll("data: signals ");
