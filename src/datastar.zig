@@ -143,7 +143,6 @@ pub fn executeScriptFmt(arena: Allocator, comptime script: []const u8, args: any
     return buf.written();
 }
 
-
 pub fn readSignals(comptime T: type, arena: std.mem.Allocator, req: *std.http.Server.Request) !T {
     switch (req.head.method) {
         .GET => {
@@ -185,6 +184,14 @@ pub fn readSignals(comptime T: type, arena: std.mem.Allocator, req: *std.http.Se
     }
 }
 
+fn CommandOptions(comptime command: Command) type {
+    return switch (command) {
+        .patchElements => PatchElementsOptions,
+        .patchSignals => PatchSignalsOptions,
+        .executeScript => ExecuteScriptOptions,
+    };
+}
+
 pub const Message = struct {
     out_buffer: *Io.Writer = undefined, // an intermediate buffer to write the expanded Datastar event stream to
     input_buffer: [8 * 1024]u8 = undefined,
@@ -198,7 +205,7 @@ pub const Message = struct {
     line_in_progress: bool = false,
     interface: Io.Writer = undefined,
 
-    fn init(m: *Message, comptime command: Command, opt: anytype, out_buffer: *Io.Writer) void {
+    fn init(m: *Message, comptime command: Command, opt: CommandOptions(command), out_buffer: *Io.Writer) void {
         m.out_buffer = out_buffer;
         m.command = command;
         m.interface = .{
@@ -220,7 +227,7 @@ pub const Message = struct {
         }
     }
 
-    pub fn swapTo(self: *Message, comptime command: Command, opt: anytype) void {
+    pub fn swapTo(self: *Message, comptime command: Command, opt: CommandOptions(command)) void {
         // always just swap to new command
         self.end() catch {};
         self.command = command;
