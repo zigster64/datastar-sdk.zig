@@ -79,4 +79,18 @@ pub fn build(b: *std.Build) void {
     const dusty_step = b.step("dusty", "Build the dusty example to zig-out/bin/example_1_dusty");
     dusty_step.dependOn(&b.addInstallArtifact(dusty_example, .{}).step);
     check.dependOn(&dusty_example.step);
+
+    // Hello world example — minimal Datastar demo, stdlib only, no framework.
+    const hello_world = b.addExecutable(.{
+        .name = "hello_world",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("examples/hello_world.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    hello_world.root_module.addImport("datastar", datastar_module);
+    const hello_step = b.step("hello", "Build the hello world example to zig-out/bin/hello_world");
+    hello_step.dependOn(&b.addInstallArtifact(hello_world, .{}).step);
+    check.dependOn(&hello_world.step);
 }

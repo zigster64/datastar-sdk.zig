@@ -107,12 +107,18 @@ fn myHandler(req: *anyframework.Request, res: *anyframework.Response) !void {
 }
 ```
 
+## Hello World Example
+
+
+## Kitchen Sink Examples
+
 For long-lived streaming (animations, multi-frame morphs, keepalive pings), grab the raw stream from your framework and write blocks as you produce them.
 
 Two complete reference ports are in `examples/`:
 
 | Target               | Output binary       | Framework                                                       | Source                          |
 | -------------------- | ------------------- | --------------------------------------------------------------- | ------------------------------- |
+| `zig build stdlib`   | `example_1_stdlib`  | Zig vanilla StdLib HTTP Server                                  | `examples/01_basic_stdlib.zig`   |
 | `zig build http.zig` | `example_1_httpz`   | [`karlseguin/http.zig`](https://github.com/karlseguin/http.zig) | `examples/01_basic_httpz.zig`   |
 | `zig build dusty`    | `example_1_dusty`   | [`lalinsky/dusty`](https://github.com/lalinsky/dusty)           | `examples/01_basic_dusty.zig`   |
 
