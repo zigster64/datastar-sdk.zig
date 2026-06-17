@@ -84,10 +84,13 @@ fn serveIndex(request: *std.http.Server.Request) !void {
     });
 }
 
+// streamHello using ultra-low-level vanilla stdlib code to do the streaming
+// In a real development, you will more than likely want to use a proper web framework on top of vanilla stdlib
+// ... but here is exactly all the low level steps you need to do SSE streaming correctly
 fn streamHello(io: Io, arena: std.mem.Allocator, request: *std.http.Server.Request) !void {
     const Signals = struct { delay_ms: i64 };
     const signals = datastar.readSignals(Signals, arena, request) catch Signals{ .delay_ms = 0 };
-    log.info("Delay is {}ms", .{signals.delay_ms});
+    log.info("Print Hello World with {}ms delay", .{signals.delay_ms});
 
     var body_buffer: [4096]u8 = undefined;
     var body = try request.respondStreaming(&body_buffer, .{
@@ -102,17 +105,17 @@ fn streamHello(io: Io, arena: std.mem.Allocator, request: *std.http.Server.Reque
     try body.flush(); // push headers to the wire before first SSE event
 
     for (0..MESSAGE.len) |i| {
-        log.info("Loop {}", .{i});
+        const msg = MESSAGE[0 .. i + 1];
         const block = try datastar.patchElementsFmt(arena,
             \\<div id="message">{s}</div>
-        , .{MESSAGE[0 .. i + 1]}, .{});
+        , .{msg}, .{});
+        std.debug.print("\r{s}\x1b[K", .{msg});
         try body.writer.writeAll(block);
         try body.writer.flush(); // drain body buffer → http_protocol_output
         try body.flush(); // flush http_protocol_output → wire
-        log.info("sending '{s}'", .{block});
         if (signals.delay_ms > 0) {
-            log.info("Waiting {}ms", .{signals.delay_ms});
             io.sleep(.fromMilliseconds(signals.delay_ms), .real) catch {};
         }
     }
+    std.debug.print("\n", .{});
 }

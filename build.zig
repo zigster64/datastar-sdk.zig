@@ -80,6 +80,22 @@ pub fn build(b: *std.Build) void {
     dusty_step.dependOn(&b.addInstallArtifact(dusty_example, .{}).step);
     check.dependOn(&dusty_example.step);
 
+    // Kitchen-sink example — stdlib only (no framework), same demo as httpz/dusty ports.
+    const stdlib_example = b.addExecutable(.{
+        .name = "example_1_stdlib",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("examples/01_basic_stdlib.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    stdlib_example.root_module.addImport("datastar", datastar_module);
+    const stdlib_install = b.addInstallArtifact(stdlib_example, .{});
+    b.getInstallStep().dependOn(&stdlib_install.step);
+    const stdlib_step = b.step("stdlib", "Build the stdlib kitchen-sink example to zig-out/bin/example_1_stdlib");
+    stdlib_step.dependOn(&stdlib_install.step);
+    check.dependOn(&stdlib_example.step);
+
     // Hello world example — minimal Datastar demo, stdlib only, no framework.
     const hello_world = b.addExecutable(.{
         .name = "hello_world",
@@ -90,7 +106,9 @@ pub fn build(b: *std.Build) void {
         }),
     });
     hello_world.root_module.addImport("datastar", datastar_module);
+    const hello_install = b.addInstallArtifact(hello_world, .{});
+    b.getInstallStep().dependOn(&hello_install.step);
     const hello_step = b.step("hello", "Build the hello world example to zig-out/bin/hello_world");
-    hello_step.dependOn(&b.addInstallArtifact(hello_world, .{}).step);
+    hello_step.dependOn(&hello_install.step);
     check.dependOn(&hello_world.step);
 }
