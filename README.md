@@ -21,6 +21,10 @@ Requires Zig **0.16.0** or newer.
 
 This package is licensed for free under the [MIT License](LICENSE).
 
+## Contributing
+
+PRs welcome. Please open an issue first to discuss non-trivial changes.
+
 ## Quick Start
 
 To download the repo, and do a test compile
@@ -39,7 +43,7 @@ zig build run
 This will run the standard Hello World Datastar example, using the Zig SDK
 
 
-## Installation
+## Installation & Usage of the SDK
 
 For using the SDK in your Zig web app project ...
 
@@ -66,7 +70,7 @@ const datastar = @import("datastar");
 
 Then apply the SDK to do Datastar things in your code !
 
-## The SDK
+## The SDK functions
 
 ```zig
 // Read Datastar signals from a request — GET pulls them from the
@@ -88,12 +92,12 @@ datastar.executeScriptFmt(arena, comptime fmt, args, opts) ![]const u8
 datastar.urlDecode(allocator, input) ![]u8
 ```
 
-Each transformer hands you back a fully-formed SSE event block — concatenate as many as you like in a single response.
+Each function is a transformer that hands you back a fully-formed SSE event block — concatenate as many as you like in a single response.
 
 Options:
 
 ```zig
-PatchElementsOptions { mode, selector, view_transition, event_id, retry_duration, namespace }
+PatchElementsOptions { mode, selector, view_transition, view_transition_selector, event_id, retry_duration, namespace }
 PatchSignalsOptions  { only_if_missing, event_id, retry_duration }
 ExecuteScriptOptions { auto_remove, attributes, event_id, retry_duration }
 
@@ -144,23 +148,9 @@ How you do this may be entirely different depending on which Zig web framework y
 
 ## Kitchen Sink Examples
 
-In the `examples` directory, there is an additional example app that demonstrates all aspects of using Datastar, including SVG morphs, etc.
+In the `examples` directory, there is an additional example app that demonstrates all aspects of using Datastar, demonstrating all the different morph modes, SVG morphs, etc.
 
-
-
-For long-lived streaming (animations, multi-frame morphs, keepalive pings), grab the raw stream from your framework and write blocks as you produce them.
-
-Two complete reference ports are in `examples/`:
-
-| Target               | Output binary       | Framework                                                       | Source                          |
-| -------------------- | ------------------- | --------------------------------------------------------------- | ------------------------------- |
-| `zig build stdlib`   | `example_1_stdlib`  | Zig vanilla StdLib HTTP Server                                  | `examples/01_basic_stdlib.zig`   |
-| `zig build http.zig` | `example_1_httpz`   | [`karlseguin/http.zig`](https://github.com/karlseguin/http.zig) | `examples/01_basic_httpz.zig`   |
-| `zig build dusty`    | `example_1_dusty`   | [`lalinsky/dusty`](https://github.com/lalinsky/dusty)           | `examples/01_basic_dusty.zig`   |
-
-Both serve the same kitchen-sink UI on `:8081`. The navbar shows which web server is driving the page.
-
-### `readSignals` in frameworks that hide the underlying request
+## Using `readSignals` in frameworks that hide the underlying request
 
 `datastar.readSignals` currently expects a `*std.http.Server.Request`. If your framework wraps the request, parse the signals JSON yourself — they arrive as `?datastar=<url-encoded-json>` on a GET, or as the raw JSON body on POST/PUT/PATCH/DELETE:
 
@@ -196,31 +186,57 @@ fn readSignalsAnyFramework(
 }
 ```
 
-## Build, Run, Test
+## Validation Test
+
+This repo contains a formal validation test to run against the Datastar ADR compliance suite
 
 ```bash
-zig build                       # builds zig-out/bin/validation-test and zig-out/bin/hello_world
-zig build test                  # run SDK unit tests
-zig build stdlib                # build the kitchen-sink demo using Zig stdlb
-zig build http.zig              # build the http.zig kitchen-sink demo
-zig build dusty                 # build the dusty kitchen-sink demo
-./zig-out/bin/validation-test   # serve the Datastar SDK conformance harness on :7331
+cd validation_tests
+zig build run
 ```
 
-To prove the SDK conforms to the Datastar wire protocol, run the validation harness and point the official validator at it:
+This will build the validation test backend, and run it on port 7331 on localhost.
+
+You can then run the official Datastar test suit against it using
 
 ```bash
-./zig-out/bin/validation-test &
 go run github.com/starfederation/datastar/sdk/tests/cmd/datastar-sdk-tests@latest
 ```
 
-The harness in `tests/validation.zig` is itself a reference for "how to use the SDK with `std.http.Server`" — about 250 lines, no extra dependencies.
+expect ...
+```bash
+% go run github.com/starfederation/datastar/sdk/tests/cmd/datastar-sdk-tests@latest
 
-## Looking for a bundled HTTP server too?
+go: downloading github.com/starfederation/datastar v1.0.2
+go: downloading github.com/starfederation/datastar/sdk/tests v0.0.0-20260602174445-850d0479e947
+PASS
+```
+To pass the test suite
+
+## Looking for a Zig web framework too?
 
 This repo is SDK-only.
 
-If you want a Datastar-aware HTTP server bundled with the SDK — with a router, batched + sync SSE, hot reload, pub/sub message bus for CQRS — see the sibling repo [`datastar.zig`](https://github.com/zigster64/datastar.zig).
+To use it, you will need to use a web framework, such as :
+
+- Zig's latest stdlib
+- Dusty 
+- http.zig
+- zzz
+- Jetzig
+- Tokamak
+.. etc
+
+If you want a Datastar-aware HTTP server for zig 0.16, bundled with this SDK and the following features
+
+- [x] radix tree router
+- [x] helpers for html/json/etc simple responses
+- [x] integrated logger with themes
+- [x] plug-based middleware with type safe assigns
+- [x] type safe pub-sub message bus for CQRS
+- [x] support for coroutine based handlers using zio
+
+... see the sibling repo [`datastar.zig`](https://github.com/zigster64/datastar.zig).
 
 ## More on Datastar
 
@@ -229,6 +245,3 @@ If you want a Datastar-aware HTTP server bundled with the SDK — with a router,
 - [Datastar Discord](https://discord.gg/YfFn7pKx)
 - [Zig Discord](https://discord.gg/Chk5WKM5)
 
-## Contributing
-
-PRs welcome. Please open an issue first to discuss non-trivial changes.

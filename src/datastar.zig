@@ -29,6 +29,7 @@ pub const PatchElementsOptions = struct {
     mode: PatchMode = .outer,
     selector: ?[]const u8 = null,
     view_transition: bool = false,
+    view_transition_selector: ?[]const u8 = null,
     event_id: ?[]const u8 = null,
     retry_duration: ?i64 = null,
     namespace: NameSpace = .html,
@@ -285,6 +286,9 @@ pub const Message = struct {
                 }
                 if (self.patch_element_options.view_transition) {
                     try w.print("data: useViewTransition true\n", .{});
+                }
+                if (self.patch_element_options.view_transition_selector) |s| {
+                    try w.print("data: viewTransitionSelector {s}\n", .{s});
                 }
                 const mt = self.patch_element_options.mode;
                 switch (mt) {
