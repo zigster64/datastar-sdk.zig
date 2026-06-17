@@ -7,12 +7,6 @@ This package requires Go 1.24 or later.
 
 A small, framework-agnostic Zig 0.16 SDK for [Datastar](https://data-star.dev) — patch DOM elements, patch signals, and execute scripts on the browser from your backend over SSE.
 
-The whole API is four functions. Each transformer takes an arena allocator and returns a ready-to-ship `event: ...\ndata: ...\n\n` SSE block.
-
-Write it to any response body with `Content-Type: text/event-stream` and you're done — works with the stdlib HTTP server, [`http.zig`](https://github.com/karlseguin/http.zig), [`dusty`](https://github.com/lalinsky/dusty), `zap`, `jetzig`, `tokamak`, or whatever else.
-
-Passes the official Datastar SDK validation suite (see `tests/validation.zig` — a self-contained harness on top of `std.http.Server`).
-
 ## Zig Version
 
 Requires Zig **0.16.0** or newer.
