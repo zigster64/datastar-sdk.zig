@@ -142,7 +142,7 @@ How you do this may be entirely different depending on which Zig web framework y
 
 ## Kitchen Sink Examples
 
-In the `examples` directory, there is an additional example app that demonstrates all aspects of using Datastar, demonstrating all the different morph modes, SVG morphs, etc.
+In the [`examples/`](examples/) directory, there is an additional example app that demonstrates all aspects of using Datastar, demonstrating all the different morph modes, SVG morphs, etc.
 
 ## Using `readSignals` in frameworks that hide the underlying request
 
