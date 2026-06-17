@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
 
     const check = b.step("check", "Check if everything compiles (for ZLS)");
 
-    const datastar_module = b.addModule("datastar", .{
+    _ = b.addModule("datastar", .{
         .root_source_file = b.path("src/datastar.zig"),
         .target = target,
         .optimize = optimize,
@@ -24,59 +24,4 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run all unit tests");
     test_step.dependOn(&run_datastar_tests.step);
     check.dependOn(&datastar_tests.step);
-
-    // Datastar SDK validation harness — builds with plain `zig build`.
-    // Listens on :7331 and is exercised by the official Datastar validator:
-    //   go run github.com/starfederation/datastar/sdk/tests/cmd/datastar-sdk-tests@latest
-    const validation_test = b.addExecutable(.{
-        .name = "validation-test",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("tests/validation.zig"),
-            .target = target,
-            .optimize = optimize,
-        }),
-    });
-    validation_test.root_module.addImport("datastar", datastar_module);
-    b.installArtifact(validation_test);
-    check.dependOn(&validation_test.step);
-
-    // Optional example: karlseguin/http.zig port — built only via `zig build http.zig`.
-    const httpz = b.dependency("httpz", .{
-        .target = target,
-        .optimize = optimize,
-    });
-    const httpz_example = b.addExecutable(.{
-        .name = "example_1_httpz",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("examples/01_basic_httpz.zig"),
-            .target = target,
-            .optimize = optimize,
-        }),
-    });
-    httpz_example.root_module.addImport("datastar", datastar_module);
-    httpz_example.root_module.addImport("httpz", httpz.module("httpz"));
-
-    const httpz_step = b.step("http.zig", "Build the http.zig example to zig-out/bin/example_1_httpz");
-    httpz_step.dependOn(&b.addInstallArtifact(httpz_example, .{}).step);
-    check.dependOn(&httpz_example.step);
-
-    // Optional example: lalinsky/dusty port — built only via `zig build dusty`.
-    const dusty = b.dependency("dusty", .{
-        .target = target,
-        .optimize = optimize,
-    });
-    const dusty_example = b.addExecutable(.{
-        .name = "example_1_dusty",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("examples/01_basic_dusty.zig"),
-            .target = target,
-            .optimize = optimize,
-        }),
-    });
-    dusty_example.root_module.addImport("datastar", datastar_module);
-    dusty_example.root_module.addImport("dusty", dusty.module("dusty"));
-
-    const dusty_step = b.step("dusty", "Build the dusty example to zig-out/bin/example_1_dusty");
-    dusty_step.dependOn(&b.addInstallArtifact(dusty_example, .{}).step);
-    check.dependOn(&dusty_example.step);
 }

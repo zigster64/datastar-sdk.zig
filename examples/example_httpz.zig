@@ -1,21 +1,7 @@
-// 01_basic.zig — the kitchen-sink example, ported to karlseguin's http.zig.
-//
-// This is the same demo as examples/01_basic.zig, but the bundled
-// datastar.HTTPServer has been swapped out for httpz. SSE payloads are now built
-// with the framework-agnostic transformer functions:
-//
-//     datastar.patchElements(arena, html, opts)         ![]const u8
-//     datastar.patchElementsFmt(arena, fmt, args, opts) ![]const u8
-//     datastar.patchSignals(arena, value, opts)         ![]const u8
-//     datastar.executeScript(arena, script, opts)       ![]const u8
-//     datastar.executeScriptFmt(arena, fmt, args, opts) ![]const u8
-//
-// The string each one returns is a complete `event: ...\ndata: ...\n\n` block;
-// concatenate as many as you want and ship them as the response body with
-// Content-Type: text/event-stream.
+// example_httpz.zig — the kitchen-sink example, ported to karlseguin's http.zig.
 //
 // Build with:  zig build http.zig
-// Run with:    ./zig-out/bin/example_1_httpz
+// Run with:    ./zig-out/bin/example_httpz
 
 const std = @import("std");
 const httpz = @import("httpz");
@@ -138,7 +124,7 @@ fn index(_: *httpz.Request, res: *httpz.Response) !void {
     res.content_type = .HTML;
     res.body = try std.fmt.allocPrint(
         res.arena,
-        @embedFile("01_index.html"),
+        @embedFile("index.html"),
         .{
             .hotreload_id = hotreload_id,
             .web_server = "http.zig Web Server",
@@ -210,7 +196,7 @@ fn patchElementsOpts(req: *httpz.Request, res: *httpz.Response) !void {
 
 fn patchElementsOptsReset(_: *httpz.Request, res: *httpz.Response) !void {
     beginSse(res);
-    res.body = try datastar.patchElements(res.arena, @embedFile("01_index_opts.html"), .{});
+    res.body = try datastar.patchElements(res.arena, @embedFile("index_opts.html"), .{});
 }
 
 // Plain JSON response — Datastar can pick up signals from a regular JSON body.
