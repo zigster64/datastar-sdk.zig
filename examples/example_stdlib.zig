@@ -1,16 +1,7 @@
-// 01_basic_stdlib.zig — kitchen-sink Datastar example, stdlib only.
-//
-// Same demo as 01_basic_httpz.zig but driven by std.http.Server (no framework).
-// All SSE payloads are built with the framework-agnostic transformer functions:
-//
-//     datastar.patchElements(arena, html, opts)         ![]const u8
-//     datastar.patchElementsFmt(arena, fmt, args, opts) ![]const u8
-//     datastar.patchSignals(arena, value, opts)         ![]const u8
-//     datastar.executeScript(arena, script, opts)       ![]const u8
-//     datastar.executeScriptFmt(arena, fmt, args, opts) ![]const u8
+// example_stdlib.zig — kitchen-sink Datastar example, stdlib only.
 //
 // Build:  zig build stdlib
-// Run:    ./zig-out/bin/example_1_stdlib
+// Run:    ./zig-out/bin/example_stdlib
 
 const std = @import("std");
 const datastar = @import("datastar");
@@ -113,7 +104,7 @@ fn handleRequest(arena: std.mem.Allocator, request: *std.http.Server.Request) !v
     }
 
     if (seg_count == 0 or std.mem.eql(u8, segments[0], "")) {
-        return serveHtml(arena, request, @embedFile("01_index.html"), .{
+        return serveHtml(arena, request, @embedFile("index.html"), .{
             .hotreload_id = hotreload_id,
             .web_server = "Zig stdlib Server",
         });
@@ -241,7 +232,7 @@ fn patchElementsOpts(arena: std.mem.Allocator, request: *std.http.Server.Request
 }
 
 fn patchElementsOptsReset(arena: std.mem.Allocator, request: *std.http.Server.Request) !void {
-    const body = try datastar.patchElements(arena, @embedFile("01_index_opts.html"), .{});
+    const body = try datastar.patchElements(arena, @embedFile("index_opts.html"), .{});
     try respondSse(arena, request, body);
 }
 

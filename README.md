@@ -1,3 +1,8 @@
+
+
+## Requirements
+
+This package requires Go 1.24 or later.
 # Datastar SDK for Zig v0.16
 
 A small, framework-agnostic Zig 0.16 SDK for [Datastar](https://data-star.dev) â€” patch DOM elements, patch signals, and execute scripts on the browser from your backend over SSE.
@@ -12,7 +17,32 @@ Passes the official Datastar SDK validation suite (see `tests/validation.zig` â€
 
 Requires Zig **0.16.0** or newer.
 
+## License
+
+This package is licensed for free under the [MIT License](LICENSE).
+
+## Quick Start
+
+To download the repo, and do a test compile
+```
+git clone https://github.com/zigster64/datastar-sdk.zig.git
+cd datastar-sdk.zig
+zig build test
+```
+
+Now to run the hello world example
+```
+cd hello_world
+zig build run
+```
+
+This will run the standard Hello World Datastar example, using the Zig SDK
+
+
 ## Installation
+
+For using the SDK in your Zig web app project ...
+
 
 ```bash
 zig fetch --save="datastar" "git+https://github.com/zigster64/datastar-sdk.zig"
@@ -33,6 +63,8 @@ In your code:
 ```zig
 const datastar = @import("datastar");
 ```
+
+Then apply the SDK to do Datastar things in your code !
 
 ## The SDK
 
@@ -107,10 +139,14 @@ fn myHandler(req: *anyframework.Request, res: *anyframework.Response) !void {
 }
 ```
 
-## Hello World Example
+How you do this may be entirely different depending on which Zig web framework you are using.
 
 
 ## Kitchen Sink Examples
+
+In the `examples` directory, there is an additional example app that demonstrates all aspects of using Datastar, including SVG morphs, etc.
+
+
 
 For long-lived streaming (animations, multi-frame morphs, keepalive pings), grab the raw stream from your framework and write blocks as you produce them.
 
@@ -163,8 +199,9 @@ fn readSignalsAnyFramework(
 ## Build, Run, Test
 
 ```bash
-zig build                       # builds zig-out/bin/validation-test
+zig build                       # builds zig-out/bin/validation-test and zig-out/bin/hello_world
 zig build test                  # run SDK unit tests
+zig build stdlib                # build the kitchen-sink demo using Zig stdlb
 zig build http.zig              # build the http.zig kitchen-sink demo
 zig build dusty                 # build the dusty kitchen-sink demo
 ./zig-out/bin/validation-test   # serve the Datastar SDK conformance harness on :7331

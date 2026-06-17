@@ -1,20 +1,7 @@
-// 01_basic_dusty.zig — the kitchen-sink example, ported to lalinsky/dusty.
-//
-// Same demo as examples/01_basic.zig but driven by Dusty's coroutine HTTP
-// server. All Datastar SSE payloads are built with the framework-agnostic
-// transformer functions:
-//
-//     datastar.patchElements(arena, html, opts)         ![]const u8
-//     datastar.patchElementsFmt(arena, fmt, args, opts) ![]const u8
-//     datastar.patchSignals(arena, value, opts)         ![]const u8
-//     datastar.executeScript(arena, script, opts)       ![]const u8
-//     datastar.executeScriptFmt(arena, fmt, args, opts) ![]const u8
-//
-// Each one returns a full `event: ...\ndata: ...\n\n` block ready to write to
-// any response body or stream as `Content-Type: text/event-stream`.
+// example_dusty.zig — the kitchen-sink example, ported to lalinsky/dusty.
 //
 // Build with:  zig build dusty
-// Run with:    ./zig-out/bin/example_1_dusty
+// Run with:    ./zig-out/bin/example_dusty
 
 const std = @import("std");
 const dusty = @import("dusty");
@@ -119,7 +106,7 @@ fn index(req: *dusty.Request, res: *dusty.Response) !void {
     res.content_type = .html;
     res.body = try std.fmt.allocPrint(
         req.arena,
-        @embedFile("01_index.html"),
+        @embedFile("index.html"),
         .{
             .hotreload_id = hotreload_id,
             .web_server = "Dusty Web Server",
@@ -191,7 +178,7 @@ fn patchElementsOpts(req: *dusty.Request, res: *dusty.Response) !void {
 
 fn patchElementsOptsReset(req: *dusty.Request, res: *dusty.Response) !void {
     try beginSseBatch(res);
-    res.body = try datastar.patchElements(req.arena, @embedFile("01_index_opts.html"), .{});
+    res.body = try datastar.patchElements(req.arena, @embedFile("index_opts.html"), .{});
 }
 
 fn jsonSignals(_: *dusty.Request, res: *dusty.Response) !void {
